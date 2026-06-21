@@ -14,7 +14,21 @@ const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 const privateKey = process.env.FIREBASE_PRIVATE_KEY;
 
 // 2. Try to load config from local credentials file
-const localCredsPath = path.join(__dirname, 'firebase-service-account.json');
+const getCredsPath = () => {
+  const filename = 'firebase-service-account.json';
+  const paths = [
+    path.join(__dirname, filename),
+    path.join(process.cwd(), 'backend', filename),
+    path.join(__dirname, '..', 'backend', filename),
+    path.join('/var/task/backend', filename)
+  ];
+  for (const p of paths) {
+    if (fs.existsSync(p)) return p;
+  }
+  return paths[0];
+};
+
+const localCredsPath = getCredsPath();
 
 try {
   if (clientEmail && privateKey) {

@@ -15,15 +15,28 @@ const PORT = process.env.PORT || 5001;
 app.use(cors());
 app.use(express.json());
 
-const DB_PATH = path.join(__dirname, 'salons.json');
-const BOOKINGS_PATH = path.join(__dirname, 'bookings.json');
-const USERS_PATH = path.join(__dirname, 'users.json');
-const REVIEWS_PATH = path.join(__dirname, 'reviews.json');
-const PROFILES_PATH = path.join(__dirname, 'profiles.json');
-const CONTACTS_PATH = path.join(__dirname, 'contacts.json');
-const PARTNERS_PATH = path.join(__dirname, 'partners.json');
-const NEWSLETTER_PATH = path.join(__dirname, 'newsletter.json');
-const BEAUTY_PROFILE_PATH = path.join(__dirname, 'beautyprofile.json');
+const getDatabasePath = (filename) => {
+  const paths = [
+    path.join(__dirname, filename),
+    path.join(process.cwd(), 'backend', filename),
+    path.join(__dirname, '..', 'backend', filename),
+    path.join('/var/task/backend', filename)
+  ];
+  for (const p of paths) {
+    if (fs.existsSync(p)) return p;
+  }
+  return paths[0];
+};
+
+const DB_PATH = getDatabasePath('salons.json');
+const BOOKINGS_PATH = getDatabasePath('bookings.json');
+const USERS_PATH = getDatabasePath('users.json');
+const REVIEWS_PATH = getDatabasePath('reviews.json');
+const PROFILES_PATH = getDatabasePath('profiles.json');
+const CONTACTS_PATH = getDatabasePath('contacts.json');
+const PARTNERS_PATH = getDatabasePath('partners.json');
+const NEWSLETTER_PATH = getDatabasePath('newsletter.json');
+const BEAUTY_PROFILE_PATH = getDatabasePath('beautyprofile.json');
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
 const safeWriteFileSync = (filePath, content) => {
