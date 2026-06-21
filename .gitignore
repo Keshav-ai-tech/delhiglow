@@ -48,3 +48,6 @@ dist/
 
 # Simulated sent emails
 backend/sent_emails/
+
+# Root-level built public directory
+public/

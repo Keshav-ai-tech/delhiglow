@@ -26,12 +26,20 @@ const NEWSLETTER_PATH = path.join(__dirname, 'newsletter.json');
 const BEAUTY_PROFILE_PATH = path.join(__dirname, 'beautyprofile.json');
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
+const safeWriteFileSync = (filePath, content) => {
+  try {
+    fs.writeFileSync(filePath, content);
+  } catch (err) {
+    console.warn(`⚠️ Warning: Failed to write to ${path.basename(filePath)} (expected on read-only environments like Vercel):`, err.message);
+  }
+};
+
 // Initialize files if they don't exist
 if (!fs.existsSync(DB_PATH)) {
-  fs.writeFileSync(DB_PATH, JSON.stringify([]));
+  safeWriteFileSync(DB_PATH, JSON.stringify([]));
 }
 if (!fs.existsSync(BOOKINGS_PATH)) {
-  fs.writeFileSync(BOOKINGS_PATH, JSON.stringify([]));
+  safeWriteFileSync(BOOKINGS_PATH, JSON.stringify([]));
 }
 // Initialize in-memory users cache; do not auto-create users.json if missing
 let usersMemory = [];
@@ -43,26 +51,31 @@ if (fs.existsSync(USERS_PATH)) {
   }
 }
 if (!fs.existsSync(REVIEWS_PATH)) {
-  fs.writeFileSync(REVIEWS_PATH, JSON.stringify([]));
+  safeWriteFileSync(REVIEWS_PATH, JSON.stringify([]));
 }
 if (!fs.existsSync(PROFILES_PATH)) {
-  fs.writeFileSync(PROFILES_PATH, JSON.stringify([]));
+  safeWriteFileSync(PROFILES_PATH, JSON.stringify([]));
 }
 if (!fs.existsSync(CONTACTS_PATH)) {
-  fs.writeFileSync(CONTACTS_PATH, JSON.stringify([]));
+  safeWriteFileSync(CONTACTS_PATH, JSON.stringify([]));
 }
 if (!fs.existsSync(PARTNERS_PATH)) {
-  fs.writeFileSync(PARTNERS_PATH, JSON.stringify([]));
+  safeWriteFileSync(PARTNERS_PATH, JSON.stringify([]));
 }
 if (!fs.existsSync(NEWSLETTER_PATH)) {
-  fs.writeFileSync(NEWSLETTER_PATH, JSON.stringify([]));
+  safeWriteFileSync(NEWSLETTER_PATH, JSON.stringify([]));
 }
 if (!fs.existsSync(BEAUTY_PROFILE_PATH)) {
-  fs.writeFileSync(BEAUTY_PROFILE_PATH, JSON.stringify([]));
+  safeWriteFileSync(BEAUTY_PROFILE_PATH, JSON.stringify([]));
 }
 if (!fs.existsSync(UPLOADS_DIR)) {
-  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  try {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  } catch (err) {
+    console.warn(`⚠️ Warning: Failed to create uploads directory ${UPLOADS_DIR}:`, err.message);
+  }
 }
+
 
 app.use('/api/uploads', express.static(UPLOADS_DIR));
 
@@ -159,7 +172,7 @@ const initializeFirebaseSync = async () => {
         }
         
         if (col.name !== 'users' || fs.existsSync(col.path)) {
-          fs.writeFileSync(col.path, JSON.stringify(remoteData, null, 2));
+          safeWriteFileSync(col.path, JSON.stringify(remoteData, null, 2));
         }
         console.log(`✅ Synced ${remoteData.length} items from Firestore '${col.name}' to local JSON.`);
       }
@@ -211,50 +224,50 @@ const readSalons = () => {
   });
 };
 const writeSalons = (data) => {
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+  safeWriteFileSync(DB_PATH, JSON.stringify(data, null, 2));
   syncCollectionToFirestore('salons', data, 'id');
 };
 const readBookings = () => JSON.parse(fs.readFileSync(BOOKINGS_PATH, 'utf8'));
 const writeBookings = (data) => {
-  fs.writeFileSync(BOOKINGS_PATH, JSON.stringify(data, null, 2));
+  safeWriteFileSync(BOOKINGS_PATH, JSON.stringify(data, null, 2));
   syncCollectionToFirestore('bookings', data, 'id');
 };
 const readUsers = () => usersMemory;
 const writeUsers = (data) => {
   usersMemory = data;
   if (fs.existsSync(USERS_PATH)) {
-    fs.writeFileSync(USERS_PATH, JSON.stringify(data, null, 2));
+    safeWriteFileSync(USERS_PATH, JSON.stringify(data, null, 2));
   }
   syncCollectionToFirestore('users', data, 'id');
 };
 const readReviews = () => JSON.parse(fs.readFileSync(REVIEWS_PATH, 'utf8'));
 const writeReviews = (data) => {
-  fs.writeFileSync(REVIEWS_PATH, JSON.stringify(data, null, 2));
+  safeWriteFileSync(REVIEWS_PATH, JSON.stringify(data, null, 2));
   syncCollectionToFirestore('reviews', data, 'id');
 };
 const readProfiles = () => JSON.parse(fs.readFileSync(PROFILES_PATH, 'utf8'));
 const writeProfiles = (data) => {
-  fs.writeFileSync(PROFILES_PATH, JSON.stringify(data, null, 2));
+  safeWriteFileSync(PROFILES_PATH, JSON.stringify(data, null, 2));
   syncCollectionToFirestore('profiles', data, 'user_id');
 };
 const readContacts = () => JSON.parse(fs.readFileSync(CONTACTS_PATH, 'utf8'));
 const writeContacts = (data) => {
-  fs.writeFileSync(CONTACTS_PATH, JSON.stringify(data, null, 2));
+  safeWriteFileSync(CONTACTS_PATH, JSON.stringify(data, null, 2));
   syncCollectionToFirestore('contacts', data, 'id');
 };
 const readPartners = () => JSON.parse(fs.readFileSync(PARTNERS_PATH, 'utf8'));
 const writePartners = (data) => {
-  fs.writeFileSync(PARTNERS_PATH, JSON.stringify(data, null, 2));
+  safeWriteFileSync(PARTNERS_PATH, JSON.stringify(data, null, 2));
   syncCollectionToFirestore('partners', data, 'id');
 };
 const readNewsletter = () => JSON.parse(fs.readFileSync(NEWSLETTER_PATH, 'utf8'));
 const writeNewsletter = (data) => {
-  fs.writeFileSync(NEWSLETTER_PATH, JSON.stringify(data, null, 2));
+  safeWriteFileSync(NEWSLETTER_PATH, JSON.stringify(data, null, 2));
   syncCollectionToFirestore('newsletter', data, 'id');
 };
 const readBeautyProfiles = () => JSON.parse(fs.readFileSync(BEAUTY_PROFILE_PATH, 'utf8'));
 const writeBeautyProfiles = (data) => {
-  fs.writeFileSync(BEAUTY_PROFILE_PATH, JSON.stringify(data, null, 2));
+  safeWriteFileSync(BEAUTY_PROFILE_PATH, JSON.stringify(data, null, 2));
   syncCollectionToFirestore('beautyprofile', data, 'user_id');
 };
 
@@ -2601,13 +2614,19 @@ app.post('/api/newsletters', (req, res) => {
 
 // Initialize Firebase Sync and start server
 initializeFirebaseSync().then(() => {
-  app.listen(PORT, () => {
-    console.log(`✅ DelhiGlow API running at http://localhost:${PORT}`);
-  });
+  if (require.main === module) {
+    app.listen(PORT, () => {
+      console.log(`✅ DelhiGlow API running at http://localhost:${PORT}`);
+    });
+  }
 }).catch(err => {
-  console.error('✕ Failed to initialize Firebase Sync, starting server anyway:', err.message);
-  app.listen(PORT, () => {
-    console.log(`✅ DelhiGlow API running at http://localhost:${PORT}`);
-  });
+  console.error('✕ Failed to initialize Firebase Sync:', err.message);
+  if (require.main === module) {
+    app.listen(PORT, () => {
+      console.log(`✅ DelhiGlow API running at http://localhost:${PORT}`);
+    });
+  }
 });
+
+module.exports = app;
 
