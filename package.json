@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "npm run build --workspace=frontend && rm -rf public && cp -r frontend/build public",
+    "build": "npm run build --workspace=frontend && rm -rf build && cp -r frontend/build build",
     "install-all": "npm install"
   },
   "workspaces": [

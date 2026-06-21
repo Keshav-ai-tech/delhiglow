@@ -16,7 +16,6 @@ firebase-service-account.json
 
 # Local JSON databases (contains user data, passwords, bookings, etc.)
 backend/users.json
-backend/salons.json
 backend/bookings.json
 backend/reviews.json
 backend/profiles.json
@@ -43,7 +42,6 @@ yarn-error.log*
 *.sw?
 
 # Build outputs
-build/
 dist/
 
 # Simulated sent emails

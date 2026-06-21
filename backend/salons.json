@@ -1,0 +1,333 @@
+[
+  {
+    "id": 1,
+    "name": "Aaradhya Bridal Studio",
+    "area": "South Delhi",
+    "location": "M-45, Greater Kailash II, New Delhi - 110048",
+    "speciality": "Bridal Makeup & Skincare",
+    "rating": 4.8,
+    "reviewsCount": 1,
+    "images": [
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800",
+      "https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=800"
+    ],
+    "services": [
+      {
+        "name": "Royal Bridal Glow Makeup",
+        "price": 15000,
+        "duration": "120 min",
+        "category": "Bridal"
+      },
+      {
+        "name": "Airbrush Bridal Makeup",
+        "price": 18000,
+        "duration": "120 min",
+        "category": "Bridal"
+      },
+      {
+        "name": "Saree Draping & Hair styling",
+        "price": 3000,
+        "duration": "45 min",
+        "category": "Hair"
+      },
+      {
+        "name": "Pre-Bridal Skincare Ritual",
+        "price": 5000,
+        "duration": "90 min",
+        "category": "Spa"
+      }
+    ],
+    "about": "Delhi's premier luxury bridal studio specializing in high-definition makeup, royal styling, and bespoke pre-wedding pampering.",
+    "closed_on": "Tuesday",
+    "contact": "+91 98100 12345",
+    "tags": [
+      "Bridal",
+      "Luxury",
+      "Makeup"
+    ],
+    "owner_id": 2,
+    "starting_price": 3000,
+    "image": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800"
+  },
+  {
+    "id": 2,
+    "name": "Gloss & Glory Salon",
+    "area": "West Delhi",
+    "location": "Road 40, Punjabi Bagh West, New Delhi - 110026",
+    "speciality": "Hair Styling & Coloring",
+    "rating": 4.6,
+    "reviewsCount": 1,
+    "images": [
+      "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800",
+      "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=800"
+    ],
+    "services": [
+      {
+        "name": "Keratin Treatment",
+        "price": 6000,
+        "duration": "150 min",
+        "category": "Hair"
+      },
+      {
+        "name": "Luxury Blow-Dry & Styling",
+        "price": 1500,
+        "duration": "45 min",
+        "category": "Hair"
+      },
+      {
+        "name": "Balayage Hair Coloring",
+        "price": 8000,
+        "duration": "180 min",
+        "category": "Hair"
+      },
+      {
+        "name": "Classic Manicure & Pedicure",
+        "price": 2000,
+        "duration": "60 min",
+        "category": "Nails"
+      }
+    ],
+    "about": "A chic, contemporary hair studio delivering cutting-edge styling, premium hair treatments, and modern color techniques.",
+    "closed_on": "Monday",
+    "contact": "+91 98765 12340",
+    "tags": [
+      "Hair",
+      "Styling",
+      "Chic"
+    ],
+    "owner_id": 1002,
+    "starting_price": 1500,
+    "image": "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800"
+  },
+  {
+    "id": 3,
+    "name": "The Luxe Vanity",
+    "area": "Central Delhi",
+    "location": "F-Block, Connaught Place, New Delhi - 110001",
+    "speciality": "Premium Nails & Aromatherapy",
+    "rating": 4.7,
+    "reviewsCount": 1,
+    "images": [
+      "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=800",
+      "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800"
+    ],
+    "services": [
+      {
+        "name": "Signature Gel Nail Extensions",
+        "price": 3500,
+        "duration": "90 min",
+        "category": "Nails"
+      },
+      {
+        "name": "Deep Tissue Massage",
+        "price": 4000,
+        "duration": "75 min",
+        "category": "Spa"
+      },
+      {
+        "name": "Aromatherapy Facial",
+        "price": 3000,
+        "duration": "60 min",
+        "category": "Spa"
+      },
+      {
+        "name": "Chrome Nail Artistry",
+        "price": 1500,
+        "duration": "45 min",
+        "category": "Nails"
+      }
+    ],
+    "about": "An opulent sanctuary in the heart of Delhi offering premium nail artistry, relaxing body spa rituals, and advanced clinical facials.",
+    "closed_on": "Wednesday",
+    "contact": "+91 91234 56789",
+    "tags": [
+      "Nails",
+      "Spa",
+      "Luxury"
+    ],
+    "owner_id": 1003,
+    "starting_price": 1500,
+    "image": "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=800"
+  },
+  {
+    "id": 4,
+    "name": "Shehnai Bridal Lounge",
+    "area": "North Delhi",
+    "location": "Block B, Model Town II, New Delhi - 110009",
+    "speciality": "Traditional Bridal Makeup",
+    "rating": 4.9,
+    "reviewsCount": 0,
+    "images": [
+      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=800",
+      "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=800"
+    ],
+    "services": [
+      {
+        "name": "Traditional Kundan Bridal Makeup",
+        "price": 12000,
+        "duration": "120 min",
+        "category": "Bridal"
+      },
+      {
+        "name": "Haldi & Mehendi Makeup",
+        "price": 5000,
+        "duration": "90 min",
+        "category": "Makeup"
+      },
+      {
+        "name": "Flora Hair Accessories styling",
+        "price": 2000,
+        "duration": "30 min",
+        "category": "Hair"
+      }
+    ],
+    "about": "Celebrating timeless tradition and cultural heritage with beautiful, classic bridal looks designed for the modern bride.",
+    "closed_on": "Monday",
+    "contact": "+91 99100 23456",
+    "tags": [
+      "Bridal",
+      "Traditional",
+      "Makeup"
+    ],
+    "owner_id": 1004,
+    "starting_price": 2000,
+    "image": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=800"
+  },
+  {
+    "id": 5,
+    "name": "Bloom Beauty Bar",
+    "area": "East Delhi",
+    "location": "Shanti Marg, Preet Vihar, New Delhi - 110092",
+    "speciality": "Express Facial & Nail Care",
+    "rating": 4.5,
+    "reviewsCount": 0,
+    "images": [
+      "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800",
+      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800"
+    ],
+    "services": [
+      {
+        "name": "Hydrating Facial Glow",
+        "price": 2500,
+        "duration": "60 min",
+        "category": "Spa"
+      },
+      {
+        "name": "Luxury Hair Spa Ritual",
+        "price": 2000,
+        "duration": "65 min",
+        "category": "Hair"
+      },
+      {
+        "name": "Nail Overlay & Art",
+        "price": 1200,
+        "duration": "40 min",
+        "category": "Nails"
+      }
+    ],
+    "about": "Your neighborhood aesthetic beauty bar providing fresh, vibrant, and quick beauty touch-ups in a warm, welcoming space.",
+    "closed_on": "Thursday",
+    "contact": "+91 98889 76543",
+    "tags": [
+      "Nails",
+      "Hair",
+      "Quick-Glow"
+    ],
+    "owner_id": 1005,
+    "starting_price": 1200,
+    "image": "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800"
+  },
+  {
+    "id": 6,
+    "name": "Opulence Salon & Spa",
+    "area": "South Delhi",
+    "location": "Ashoka Hotel, Chanakyapuri, New Delhi - 110021",
+    "speciality": "Ayurvedic Spa & Wellness",
+    "rating": 4.8,
+    "reviewsCount": 0,
+    "images": [
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800",
+      "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=800"
+    ],
+    "services": [
+      {
+        "name": "Royal Ayurvedic Body Ritual",
+        "price": 7000,
+        "duration": "90 min",
+        "category": "Spa"
+      },
+      {
+        "name": "Caviar Skin Renewal Facial",
+        "price": 9000,
+        "duration": "75 min",
+        "category": "Spa"
+      },
+      {
+        "name": "Luxury Couple Spa Package",
+        "price": 12000,
+        "duration": "120 min",
+        "category": "Spa"
+      }
+    ],
+    "about": "An ultra-luxury sanctuary offering world-class skin therapies, therapeutic wellness rituals, and bespoke body massage retreats.",
+    "closed_on": "Tuesday",
+    "contact": "+91 93112 88990",
+    "tags": [
+      "Spa",
+      "Wellness",
+      "Luxury"
+    ],
+    "owner_id": 1006,
+    "starting_price": 7000,
+    "image": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800"
+  },
+  {
+    "id": 1781984214911,
+    "name": "Royal Salon",
+    "active": true,
+    "staff_can_reply": false,
+    "area": "North Delhi",
+    "location": "New delhi",
+    "rating": 5,
+    "reviews": 0,
+    "price_range": "₹₹₹",
+    "starting_price": 3000,
+    "image": "/api/uploads/954a7e6c0d95eb36_1781984302045.jpg",
+    "tags": [
+      "Luxury",
+      "Bridal"
+    ],
+    "speciality": "Bridal",
+    "about": "To preserve our premium catalog standard, your listing for Royal Salon is currently set to Draft Mode and is hidden from public search. To go live, log in to your dashboard and complete your",
+    "services": [
+      {
+        "name": "Bridal",
+        "price": 15000,
+        "duration": "1 hr"
+      },
+      {
+        "name": "Nail",
+        "price": 5000,
+        "duration": "1 hr"
+      },
+      {
+        "name": "MAke up",
+        "price": 3000,
+        "duration": "1 hr"
+      }
+    ],
+    "timings": "10:00 AM – 8:00 PM",
+    "closed_on": "None",
+    "contact": "9888246148",
+    "photos": [
+      "/api/uploads/954a7e6c0d95eb36_1781984302045.jpg",
+      "/api/uploads/c7e657a645673c98_1781984302067.jpg",
+      "/api/uploads/04516d508da201fe_1781984302098.jpg"
+    ],
+    "latitude": 28.6139,
+    "longitude": 77.209,
+    "email": "alanbaker958@gmail.com",
+    "whatsapp": "9888246148",
+    "city": "New Delhi"
+  }
+]

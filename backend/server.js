@@ -2636,11 +2636,14 @@ app.post('/api/newsletters', (req, res) => {
 });
 
 // Serve static files from the React frontend build
+const ROOT_BUILD_PATH = path.join(__dirname, '../build');
 const FRONTEND_BUILD_PATH = path.join(__dirname, '../frontend/build');
 const ROOT_PUBLIC_PATH = path.join(__dirname, '../public');
 
 let staticPath = '';
-if (fs.existsSync(FRONTEND_BUILD_PATH)) {
+if (fs.existsSync(ROOT_BUILD_PATH)) {
+  staticPath = ROOT_BUILD_PATH;
+} else if (fs.existsSync(FRONTEND_BUILD_PATH)) {
   staticPath = FRONTEND_BUILD_PATH;
 } else if (fs.existsSync(ROOT_PUBLIC_PATH)) {
   staticPath = ROOT_PUBLIC_PATH;
