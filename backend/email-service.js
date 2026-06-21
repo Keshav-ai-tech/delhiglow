@@ -13,9 +13,6 @@ const smtpConfig = {
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
-  },
-  tls: {
-    rejectUnauthorized: false // Prevents failure due to self-signed certs in containerized environments
   }
 };
 
@@ -28,13 +25,7 @@ const isSmtpConfigured = smtpConfig.host &&
 
 if (isSmtpConfigured) {
   transporter = nodemailer.createTransport(smtpConfig);
-  transporter.verify((error, success) => {
-    if (error) {
-      console.error('✕ SMTP transporter verification failed:', error.message);
-    } else {
-      console.log('⚡ Nodemailer SMTP transporter initialized and verified successfully.');
-    }
-  });
+  console.log('⚡ Nodemailer SMTP transporter initialized.');
 } else {
   console.warn('⚠️ SMTP settings not configured or using placeholders. Welcome emails will be logged locally to backend/sent_emails/');
 }
