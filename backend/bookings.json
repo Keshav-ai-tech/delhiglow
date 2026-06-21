@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "id": 1782057925481,
+    "salon_id": 1,
+    "salon_name": "Aaradhya Bridal Studio",
+    "service": "Party Makeup",
+    "date": "2026-06-24",
+    "time": "12:00 PM",
+    "name": "Test Customer",
+    "phone": "9999922222",
+    "email": "test_open_day@gmail.com",
+    "price": 2000,
+    "duration": "45 min",
+    "status": "confirmed",
+    "created_at": "2026-06-21T16:05:25.481Z"
+  }
+]

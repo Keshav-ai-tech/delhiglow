@@ -102,35 +102,46 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 
 app.use('/api/uploads', express.static(UPLOADS_DIR));
 
+// Memory cache for keeping track of the last synced state of each Firestore collection
+const lastSyncedState = {};
+
 // Background Firestore synchronization helper
 const syncCollectionToFirestore = async (collectionName, dataArray, idKey = 'id') => {
   if (!isFirebaseActive || !db) return;
   try {
-    const batch = db.batch();
     const collectionRef = db.collection(collectionName);
+    const previous = lastSyncedState[collectionName] || [];
     
-    // Get existing documents in Firestore to find deletions
-    const snapshot = await collectionRef.get();
-    const existingIds = new Set();
-    snapshot.forEach(doc => existingIds.add(doc.id));
+    const prevMap = new Map(previous.map(item => [String(item[idKey]), item]));
+    const currMap = new Map(dataArray.map(item => [String(item[idKey]), item]));
     
-    const currentIds = new Set();
-    dataArray.forEach(item => {
-      const id = String(item[idKey]);
-      currentIds.add(id);
-      const docRef = collectionRef.doc(id);
-      batch.set(docRef, item);
-    });
+    const batch = db.batch();
+    let operationsCount = 0;
     
-    // Delete items that are no longer in the dataArray
-    existingIds.forEach(id => {
-      if (!currentIds.has(id)) {
-        batch.delete(collectionRef.doc(id));
+    // Find additions and modifications
+    for (const [id, item] of currMap.entries()) {
+      const prevItem = prevMap.get(id);
+      if (!prevItem || JSON.stringify(prevItem) !== JSON.stringify(item)) {
+        batch.set(collectionRef.doc(id), item);
+        operationsCount++;
       }
-    });
+    }
     
-    await batch.commit();
-    console.log(`⚡ Synced collection '${collectionName}' to Firestore (${dataArray.length} items, including deletions).`);
+    // Find deletions
+    for (const id of prevMap.keys()) {
+      if (!currMap.has(id)) {
+        batch.delete(collectionRef.doc(id));
+        operationsCount++;
+      }
+    }
+    
+    if (operationsCount > 0) {
+      await batch.commit();
+      console.log(`⚡ Synced collection '${collectionName}' to Firestore (${operationsCount} operations committed).`);
+    }
+    
+    // Update cache
+    lastSyncedState[collectionName] = JSON.parse(JSON.stringify(dataArray));
   } catch (error) {
     console.error(`✕ Error syncing collection '${collectionName}' to Firestore:`, error.message);
   }
@@ -157,7 +168,7 @@ const initializeFirebaseSync = async () => {
     { name: 'beautyprofile', path: BEAUTY_PROFILE_PATH, idKey: 'user_id' }
   ];
   
-  for (const col of collections) {
+  await Promise.all(collections.map(async (col) => {
     try {
       const snapshot = await db.collection(col.name).get();
       if (snapshot.empty) {
@@ -170,6 +181,7 @@ const initializeFirebaseSync = async () => {
           localData = JSON.parse(fs.readFileSync(col.path, 'utf8'));
         }
         if (localData && localData.length > 0) {
+          lastSyncedState[col.name] = [];
           await syncCollectionToFirestore(col.name, localData, col.idKey);
         }
       } else {
@@ -197,12 +209,15 @@ const initializeFirebaseSync = async () => {
         if (col.name !== 'users' || fs.existsSync(col.path)) {
           safeWriteFileSync(col.path, JSON.stringify(remoteData, null, 2));
         }
+        
+        // Cache the remote state
+        lastSyncedState[col.name] = JSON.parse(JSON.stringify(remoteData));
         console.log(`✅ Synced ${remoteData.length} items from Firestore '${col.name}' to local JSON.`);
       }
     } catch (error) {
       console.error(`✕ Error initializing sync for collection '${col.name}':`, error.message);
     }
-  }
+  }));
 };
 
 const preseededImageMap = {
