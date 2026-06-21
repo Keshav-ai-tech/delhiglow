@@ -15,6 +15,16 @@ const PORT = process.env.PORT || 5001;
 app.use(cors());
 app.use(express.json());
 
+// Middleware to prepend /api on Vercel where the routePrefix is automatically stripped
+if (process.env.VERCEL) {
+  app.use((req, res, next) => {
+    if (!req.url.startsWith('/api')) {
+      req.url = '/api' + req.url;
+    }
+    next();
+  });
+}
+
 const getDatabasePath = (filename) => {
   const paths = [
     path.join(__dirname, filename),
