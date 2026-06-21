@@ -2625,6 +2625,28 @@ app.post('/api/newsletters', (req, res) => {
   res.status(201).json({ success: true, message: 'Subscribed successfully', data: newSubscriber });
 });
 
+// Serve static files from the React frontend build
+const FRONTEND_BUILD_PATH = path.join(__dirname, '../frontend/build');
+const ROOT_PUBLIC_PATH = path.join(__dirname, '../public');
+
+let staticPath = '';
+if (fs.existsSync(FRONTEND_BUILD_PATH)) {
+  staticPath = FRONTEND_BUILD_PATH;
+} else if (fs.existsSync(ROOT_PUBLIC_PATH)) {
+  staticPath = ROOT_PUBLIC_PATH;
+}
+
+if (staticPath) {
+  console.log(`📂 Serving static frontend assets from: ${staticPath}`);
+  app.use(express.static(staticPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(staticPath, 'index.html'));
+  });
+}
+
 // Initialize Firebase Sync and start server
 initializeFirebaseSync().then(() => {
   if (require.main === module) {
