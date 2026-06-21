@@ -1,0 +1,26 @@
+[
+  {
+    "user_id": 1782042051314,
+    "bio": "DelhiGlow Customer Connoisseur.",
+    "gender": "Not specified",
+    "avatar": "",
+    "updated_at": "2026-06-21T11:41:34.862Z",
+    "beautyProfile": {
+      "persona": "The Urban Quick-Chic",
+      "emoji": "⚡💇‍♀️💄",
+      "vibes": [
+        "Glow-Up Facial"
+      ],
+      "style": "The Quick Queen",
+      "treat": "A fresh haircut or blow-dry",
+      "budget": "Under ₹500",
+      "types": [
+        "Combination"
+      ],
+      "environment": "A chic, modern studio with curated music",
+      "nonNegotiable": "Perfectly shaped eyebrows",
+      "distance": "Within 5 km",
+      "completed_at": "2026-06-21T11:41:34.535Z"
+    }
+  }
+]
