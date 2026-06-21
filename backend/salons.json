@@ -353,5 +353,101 @@
     "closed_on": "None",
     "contact": "9888877777",
     "photos": []
+  },
+  {
+    "id": 1782058748238,
+    "name": "The Imperial Spa & Salon",
+    "active": false,
+    "staff_can_reply": false,
+    "area": "Connaught Place",
+    "location": "New Delhi",
+    "rating": 5,
+    "reviews": 0,
+    "price_range": "₹₹₹",
+    "starting_price": 0,
+    "image": "",
+    "tags": [
+      "Luxury",
+      "Elite Spa & Grooming"
+    ],
+    "speciality": "Elite Spa & Grooming",
+    "about": "Welcome to The Imperial Spa & Salon, a boutique luxury sanctuary handpicked for DelhiGlow.",
+    "services": [],
+    "timings": "10:00 AM – 8:00 PM",
+    "closed_on": "None",
+    "contact": "9888877777",
+    "photos": []
+  },
+  {
+    "id": 1782063095536,
+    "name": "Royal Salon",
+    "active": false,
+    "staff_can_reply": false,
+    "area": "South Delhi",
+    "location": "New delhi",
+    "rating": 5,
+    "reviews": 0,
+    "price_range": "₹₹₹",
+    "starting_price": 0,
+    "image": "",
+    "tags": [
+      "Luxury",
+      "Bridal"
+    ],
+    "speciality": "Bridal",
+    "about": "Welcome to Royal Salon, a boutique luxury sanctuary handpicked for DelhiGlow.",
+    "services": [],
+    "timings": "10:00 AM – 8:00 PM",
+    "closed_on": "None",
+    "contact": "9888246148",
+    "photos": []
+  },
+  {
+    "id": 1782063313813,
+    "name": "The Imperial Spa & Salon",
+    "active": false,
+    "staff_can_reply": false,
+    "area": "Connaught Place",
+    "location": "New Delhi",
+    "rating": 5,
+    "reviews": 0,
+    "price_range": "₹₹₹",
+    "starting_price": 0,
+    "image": "",
+    "tags": [
+      "Luxury",
+      "Elite Spa & Grooming"
+    ],
+    "speciality": "Elite Spa & Grooming",
+    "about": "Welcome to The Imperial Spa & Salon, a boutique luxury sanctuary handpicked for DelhiGlow.",
+    "services": [],
+    "timings": "10:00 AM – 8:00 PM",
+    "closed_on": "None",
+    "contact": "9888877777",
+    "photos": []
+  },
+  {
+    "id": 1782065045514,
+    "name": "The Imperial Spa & Salon",
+    "active": false,
+    "staff_can_reply": false,
+    "area": "Connaught Place",
+    "location": "New Delhi",
+    "rating": 5,
+    "reviews": 0,
+    "price_range": "₹₹₹",
+    "starting_price": 0,
+    "image": "",
+    "tags": [
+      "Luxury",
+      "Elite Spa & Grooming"
+    ],
+    "speciality": "Elite Spa & Grooming",
+    "about": "Welcome to The Imperial Spa & Salon, a boutique luxury sanctuary handpicked for DelhiGlow.",
+    "services": [],
+    "timings": "10:00 AM – 8:00 PM",
+    "closed_on": "None",
+    "contact": "9888877777",
+    "photos": []
   }
 ]

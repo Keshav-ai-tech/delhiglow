@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1FSYHalHQpNiNuS1hMH5BQoh34F3",
+    "name": "alanbaker958",
+    "email": "alanbaker958@gmail.com",
+    "phone": "",
+    "passwordHash": "",
+    "salt": "",
+    "role": "owner",
+    "salon_id": 1781984214911,
+    "welcomeEmailSent": true,
+    "notifications": {
+      "email": true,
+      "sms": false,
+      "whatsapp": true
+    }
+  }
+]

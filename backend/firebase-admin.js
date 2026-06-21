@@ -32,11 +32,19 @@ const localCredsPath = getCredsPath();
 
 try {
   if (clientEmail && privateKey) {
+    let formattedKey = privateKey.trim();
+    // Strip surrounding quotes if present
+    if (formattedKey.startsWith('"') && formattedKey.endsWith('"')) {
+      formattedKey = formattedKey.slice(1, -1);
+    }
+    // Format newline characters
+    formattedKey = formattedKey.replace(/\\n/g, '\n');
+
     const app = admin.initializeApp({
       credential: admin.cert({
         projectId,
         clientEmail,
-        privateKey: privateKey.replace(/\\n/g, '\n'), // format newline chars in private key
+        privateKey: formattedKey,
       })
     });
     db = getFirestore(app, 'delhiglow');
