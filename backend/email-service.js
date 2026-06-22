@@ -6,10 +6,11 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // SMTP configuration from environment
+const smtpPort = parseInt(process.env.SMTP_PORT || '587');
 const smtpConfig = {
   host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+  port: smtpPort,
+  secure: process.env.SMTP_SECURE !== undefined ? process.env.SMTP_SECURE === 'true' : (smtpPort === 465),
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS

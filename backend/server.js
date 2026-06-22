@@ -451,6 +451,137 @@ const generateToken = (user) => {
   return Buffer.from(JSON.stringify(payload)).toString('base64');
 };
 
+// Helper to look up a user by uid or email, checking in-memory cache first, then Firestore directly
+const getUserByIdOrEmail = async (uid, email) => {
+  const emailLower = email ? email.toLowerCase() : '';
+  
+  // 1. Search in-memory cache
+  let user = usersMemory.find(u => 
+    (uid && String(u.id) === String(uid)) || 
+    (emailLower && u.email.toLowerCase() === emailLower)
+  );
+  
+  // 2. If not in memory, but Firebase/Firestore is active, query Firestore directly
+  if (!user && isFirebaseActive && db) {
+    try {
+      let queryDoc = null;
+      if (uid) {
+        queryDoc = await db.collection('users').doc(String(uid)).get();
+      } else if (emailLower) {
+        const snap = await db.collection('users').where('email', '==', emailLower).limit(1).get();
+        if (!snap.empty) {
+          queryDoc = snap.docs[0];
+        }
+      }
+      
+      if (queryDoc && queryDoc.exists) {
+        user = queryDoc.data();
+        // Update in-memory cache
+        usersMemory.push(user);
+        if (fs.existsSync(USERS_PATH)) {
+          safeWriteFileSync(USERS_PATH, JSON.stringify(usersMemory, null, 2));
+        }
+        console.log(`⚡ Loaded user ${user.email} from Firestore into memory cache (role: ${user.role}).`);
+      }
+    } catch (error) {
+      console.error('✕ Error fetching user from Firestore:', error.message);
+    }
+  }
+  
+  return user;
+};
+
+// Helper to auto-provision a missing Firebase user record correctly resolving custom claims or pre-seeded rules
+const autoProvisionUser = async (decodedToken) => {
+  const userId = decodedToken.uid;
+  const emailLower = decodedToken.email.toLowerCase();
+  
+  // Try to retrieve custom claims from Firebase Auth to get the registered role
+  let role = decodedToken.role;
+  let salonId = decodedToken.salon_id;
+  
+  if ((!role || salonId === undefined) && isFirebaseActive && auth) {
+    try {
+      const fbUser = await auth.getUser(userId);
+      if (fbUser && fbUser.customClaims) {
+        role = fbUser.customClaims.role;
+        salonId = fbUser.customClaims.salon_id;
+        console.log(`⚡ Retrieved custom claims from Firebase Auth for auto-provisioning: role=${role}, salon_id=${salonId}`);
+      }
+    } catch (e) {
+      console.warn('⚠️ Warning: Failed to retrieve user claims from Firebase Auth:', e.message);
+    }
+  }
+  
+  // Fallback heuristics if no custom claims found
+  const salons = readSalons();
+  const matchedSalon = salons.find(s => s.email && s.email.toLowerCase() === emailLower);
+  const isOwnerEmail = emailLower.includes('owner') || !!matchedSalon;
+  
+  if (!role) {
+    role = isOwnerEmail ? 'owner' : 'customer';
+  }
+  if (salonId === undefined || salonId === null) {
+    salonId = matchedSalon ? matchedSalon.id : null;
+  }
+  
+  const user = {
+    id: userId,
+    name: decodedToken.name || decodedToken.email.split('@')[0],
+    email: emailLower,
+    phone: '',
+    passwordHash: '',
+    salt: '',
+    role: role,
+    salon_id: salonId,
+    welcomeEmailSent: true,
+    notifications: { email: true, sms: false, whatsapp: true }
+  };
+  
+  // Find existing beauty profile if any
+  const beautyProfiles = readBeautyProfiles();
+  const bp = beautyProfiles.find(p => String(p.user_id) === String(userId));
+  if (bp) {
+    const { user_id, updated_at, ...profileData } = bp;
+    user.beautyProfile = profileData;
+  }
+  
+  usersMemory.push(user);
+  writeUsers(usersMemory);
+  
+  // Send welcome email asynchronously
+  sendWelcomeEmail(user.email, user.name, role).catch(e => {
+    console.error('Failed to send welcome email during auto-provisioning:', e.message);
+  });
+  
+  // Auto-provision profile record if missing
+  const profiles = readProfiles();
+  let profile = profiles.find(p => String(p.user_id) === String(user.id));
+  if (!profile) {
+    profile = {
+      user_id: user.id,
+      bio: `DelhiGlow ${role === 'owner' ? 'Salon Partner' : role === 'staff' ? 'Staff Specialist' : 'Customer Connoisseur'}.`,
+      gender: 'Not specified',
+      avatar: '',
+      updated_at: new Date().toISOString()
+    };
+    profiles.push(profile);
+    writeProfiles(profiles);
+  }
+  
+  // Set custom claims in Firebase Auth if active so that they are present in future ID tokens
+  if (isFirebaseActive && auth) {
+    try {
+      await auth.setCustomUserClaims(userId, { role, salon_id: salonId });
+      console.log(`⚡ Initialized custom claims for auto-provisioned user ${userId}: role=${role}, salon_id=${salonId}`);
+    } catch (err) {
+      console.error('✕ Failed to set custom claims for auto-provisioned user:', err.message);
+    }
+  }
+  
+  return user;
+};
+
 // Authentication Middleware
 const authMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -472,58 +603,10 @@ const authMiddleware = async (req, res, next) => {
   
   if (decodedToken) {
     try {
-      const users = readUsers();
-      let user = users.find(u => String(u.id) === String(decodedToken.uid) || u.email.toLowerCase() === decodedToken.email.toLowerCase());
+      let user = await getUserByIdOrEmail(decodedToken.uid, decodedToken.email);
       
       if (!user) {
-        // Auto-provision user record in database if authenticated via Firebase but missing in our collection
-        const emailLower = decodedToken.email.toLowerCase();
-        const salons = readSalons();
-        const matchedSalon = salons.find(s => s.email && s.email.toLowerCase() === emailLower);
-        const isOwnerEmail = emailLower.includes('owner') || !!matchedSalon;
-        const role = isOwnerEmail ? 'owner' : 'customer';
-        const salonId = matchedSalon ? matchedSalon.id : null;
-
-        user = {
-          id: decodedToken.uid,
-          name: decodedToken.name || decodedToken.email.split('@')[0],
-          email: decodedToken.email.toLowerCase(),
-          phone: '',
-          passwordHash: '',
-          salt: '',
-          role: role,
-          salon_id: salonId,
-          welcomeEmailSent: true,
-          notifications: { email: true, sms: false, whatsapp: true }
-        };
-
-        // Find existing beauty profile if any
-        const beautyProfiles = readBeautyProfiles();
-        const bp = beautyProfiles.find(p => String(p.user_id) === String(decodedToken.uid));
-        if (bp) {
-          const { user_id, updated_at, ...profileData } = bp;
-          user.beautyProfile = profileData;
-        }
-
-        users.push(user);
-        writeUsers(users);
-
-        // Send welcome email asynchronously
-        sendWelcomeEmail(user.email, user.name, role).catch(e => {
-          console.error('Failed to send welcome email during auto-provisioning:', e.message);
-        });
-        
-        // Also auto-provision profile record
-        const profiles = readProfiles();
-        const newProfile = {
-          user_id: user.id,
-          bio: 'DelhiGlow Customer Connoisseur.',
-          gender: 'Not specified',
-          avatar: '',
-          updated_at: new Date().toISOString()
-        };
-        profiles.push(newProfile);
-        writeProfiles(profiles);
+        user = await autoProvisionUser(decodedToken);
       }
       
       req.user = {
@@ -808,8 +891,8 @@ app.post('/api/auth/register', async (req, res) => {
     return res.status(400).json({ success: false, message: 'All authentication fields are required' });
   }
 
-  const users = readUsers();
-  if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+  const existingUser = await getUserByIdOrEmail(null, email);
+  if (existingUser) {
     return res.status(400).json({ success: false, message: 'An account with this email address already exists' });
   }
 
@@ -886,8 +969,18 @@ app.post('/api/auth/register', async (req, res) => {
     notifications: { email: true, sms: false, whatsapp: true }
   };
 
-  users.push(newUser);
-  writeUsers(users);
+  usersMemory.push(newUser);
+  writeUsers(usersMemory);
+
+  // Set custom user claims in Firebase Auth if active so that they persist in their token
+  if (isFirebaseActive && auth) {
+    try {
+      await auth.setCustomUserClaims(userId, { role, salon_id: salonId });
+      console.log(`⚡ Set custom claims for user ${userId}: role=${role}, salon_id=${salonId}`);
+    } catch (e) {
+      console.error('✕ Failed to set Firebase Auth custom claims during registration:', e.message);
+    }
+  }
 
   // Send welcome email asynchronously
   sendWelcomeEmail(newUser.email, newUser.name, newUser.role, salonName).catch(e => {
@@ -952,47 +1045,10 @@ app.post('/api/auth/login', async (req, res) => {
   }
 
   if (decodedToken) {
-    const users = readUsers();
-    let user = users.find(u => String(u.id) === String(decodedToken.uid) || u.email.toLowerCase() === decodedToken.email.toLowerCase());
+    let user = await getUserByIdOrEmail(decodedToken.uid, decodedToken.email);
     
     if (!user) {
-      // Create a default user in our DB if they exist in Firebase Auth but not locally yet
-      const userId = decodedToken.uid;
-      const emailLower = decodedToken.email.toLowerCase();
-      const salons = readSalons();
-      const matchedSalon = salons.find(s => s.email && s.email.toLowerCase() === emailLower);
-      const isOwnerEmail = emailLower.includes('owner') || !!matchedSalon;
-      const role = isOwnerEmail ? 'owner' : 'customer';
-      const salonId = matchedSalon ? matchedSalon.id : null;
-
-      user = {
-        id: userId,
-        name: decodedToken.name || decodedToken.email.split('@')[0],
-        email: decodedToken.email.toLowerCase(),
-        phone: '',
-        passwordHash: '',
-        salt: '',
-        role: role,
-        salon_id: salonId,
-        welcomeEmailSent: true,
-        notifications: { email: true, sms: false, whatsapp: true }
-      };
-
-      // Find existing beauty profile if any
-      const beautyProfiles = readBeautyProfiles();
-      const bp = beautyProfiles.find(p => String(p.user_id) === String(userId));
-      if (bp) {
-        const { user_id, updated_at, ...profileData } = bp;
-        user.beautyProfile = profileData;
-      }
-
-      users.push(user);
-      writeUsers(users);
-
-      // Send welcome email asynchronously
-      sendWelcomeEmail(user.email, user.name, role).catch(e => {
-        console.error('Failed to send welcome email during login auto-provisioning:', e.message);
-      });
+      user = await autoProvisionUser(decodedToken);
     } else if (String(user.id) !== String(decodedToken.uid)) {
       // Update user ID to be the uid for consistency
       const oldId = user.id;
@@ -1011,7 +1067,7 @@ app.post('/api/auth/login', async (req, res) => {
       });
       writeReviews(reviews);
       
-      writeUsers(users);
+      writeUsers(usersMemory);
     }
 
     // Auto-generate profile if missing
@@ -1048,8 +1104,7 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Email and password are required' });
   }
 
-  const users = readUsers();
-  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  const user = await getUserByIdOrEmail(null, email);
 
   if (!user) {
     return res.status(400).json({ success: false, message: 'Invalid email address or password' });
@@ -2195,6 +2250,63 @@ app.delete('/api/profile', authMiddleware, async (req, res) => {
       console.log(`⚡ Firebase Auth user deleted for UID: ${userId}`);
     } catch (e) {
       console.warn(`⚠️ Warning: Could not delete user from Firebase Auth:`, e.message);
+    }
+  }
+
+  // Direct Firestore deletions to prevent desynchronization
+  if (isFirebaseActive && db) {
+    try {
+      const batch = db.batch();
+      
+      // Delete user doc
+      batch.delete(db.collection('users').doc(String(userId)));
+      // Delete profile doc
+      batch.delete(db.collection('profiles').doc(String(userId)));
+      // Delete beautyprofile doc
+      batch.delete(db.collection('beautyprofile').doc(String(userId)));
+      
+      // Delete user's reviews
+      const userReviewsSnap = await db.collection('reviews').where('user_id', '==', userId).get();
+      userReviewsSnap.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      
+      // Delete user's bookings (by email match)
+      if (userEmail) {
+        const bookingsSnap = await db.collection('bookings').where('email', '==', userEmail.toLowerCase()).get();
+        bookingsSnap.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+      }
+      
+      // If owner, cascade delete salon, staff, bookings, reviews from Firestore directly
+      if (userRole === 'owner' && userSalonId) {
+        batch.delete(db.collection('salons').doc(String(userSalonId)));
+        
+        // Find staff members of this salon
+        const staffIds = users.filter(u => u.role === 'staff' && u.salon_id === userSalonId).map(u => u.id);
+        for (const staffId of staffIds) {
+          batch.delete(db.collection('users').doc(String(staffId)));
+          batch.delete(db.collection('profiles').doc(String(staffId)));
+        }
+        
+        // Find bookings of this salon
+        const salonBookingsSnap = await db.collection('bookings').where('salon_id', '==', userSalonId).get();
+        salonBookingsSnap.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+        
+        // Find reviews of this salon
+        const salonReviewsSnap = await db.collection('reviews').where('salon_id', '==', userSalonId).get();
+        salonReviewsSnap.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+      }
+      
+      await batch.commit();
+      console.log(`⚡ Direct Firestore cascade delete committed successfully for UID: ${userId}`);
+    } catch (e) {
+      console.error('✕ Failed direct Firestore cascade delete:', e.message);
     }
   }
 
