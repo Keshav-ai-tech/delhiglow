@@ -47,7 +47,3 @@ coverage/
 # Package lock files (optional)
 # package-lock.json
 # yarn.lock
-
-# App local outputs
-backend/sent_emails/
-backend/uploads/
